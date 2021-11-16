@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("order")
 public interface OrderService {
 
-    @GetMapping("/order")
-    public String getOrder(@RequestParam("name") String name);
+//    @GetMapping("/order")
+//    public String getOrder(@RequestParam("name") String name);
 }

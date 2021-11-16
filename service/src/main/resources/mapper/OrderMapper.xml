@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zpain.service.mapper.OrderMapper">
+
+    <sql id="params">
+        id,order_id,order_name
+    </sql>
+
+    <insert id="insertOrder" parameterType="com.zpain.service.pojo.OrderInfo">
+        insert into order_info (<include refid="params"/>) values (#{id,jdbcType=BIGINT}
+        ,#{orderId,jdbcType=VARCHAR},#{orderName,jdbcType=VARCHAR})
+    </insert>
+    <select id="getOrderInfo" resultType="com.zpain.service.pojo.OrderInfo">
+        select <include refid="params"/> from order_info
+    </select>
+</mapper>
