@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zpain.service.pojo.OrderInfo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @author zhangjun
  * @date 2021/11/15  15:57
  */
 @Mapper
-public interface OrderMapper extends BaseMapper<OrderMapper> {
+public interface OrderMapper extends BaseMapper<OrderInfo> {
 
     /**
      * 插入数据
@@ -28,5 +30,7 @@ public interface OrderMapper extends BaseMapper<OrderMapper> {
      * @return
      */
     IPage<OrderInfo> getOrderInfo(Page<OrderInfo> orderInfoPage);
+
+    int insertBatchSomeColumn(List<OrderInfo> entityList);
 
 }

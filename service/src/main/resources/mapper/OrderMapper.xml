@@ -3,7 +3,7 @@
 <mapper namespace="com.zpain.service.mapper.OrderMapper">
 
     <sql id="params">
-        id,order_id,order_name
+        id,order_id,order_name,create_date
     </sql>
 
     <insert id="insertOrder" parameterType="com.zpain.service.pojo.OrderInfo">

@@ -25,6 +25,10 @@ public class KeyGenerator implements InitializingBean {
         return generator.generateKey().toString();
     }
 
+    public Long generatorSnowflakeKeyLong(){
+        return Long.parseLong(generatorSnowflakeKey());
+    }
+
     public Long initWorkerId() {
         Long workerId = 0L;
         int ipv4Length = 4;
