@@ -1,6 +1,8 @@
 package com.zpain.service.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -64,8 +66,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void getAll(HttpServletResponse response) throws IOException {
         LocalDateTime now1 = LocalDateTime.now();
-        int threadSize = 5;
-        int num = 4000;
+        int num = 5000;
         //查询数据库表数据量
         Long count = orderMapper.selectCount(null);
         if (count > 0) {
@@ -73,17 +74,19 @@ public class OrderServiceImpl implements OrderService {
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
             // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
-            String fileName = URLEncoder.encode("测试", "UTF-8");
+            String fileName = URLEncoder.encode("zpain", "UTF-8");
             response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
             long batch = (count / num + 1);
             int batchNum = (int) batch;
-            ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("zpain-g-pool").build();
-            ThreadPoolExecutor executor = new ThreadPoolExecutor(threadSize, threadSize, 60
-                    , TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), factory);
+            ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("zpain-g-pool-%d").build();
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(batchNum, batchNum, 60
+                    , TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), factory, new ThreadPoolExecutor.AbortPolicy());
             List<Future<List<OrderInfo>>> futureList = new ArrayList<>();
-            for (int i = 1; i <= threadSize; i++) {
+            ExcelWriter write = EasyExcel.write(response.getOutputStream(), OrderExcel.class).build();
+            for (int i = 1; i <= batchNum; i++) {
                 int pageNum = i;
                 Future<List<OrderInfo>> listFuture = executor.submit(() -> {
+                    log.info("threadName:{}", Thread.currentThread().getName());
                     List<OrderInfo> list = new ArrayList<>();
                     Page<OrderInfo> page = new Page<OrderInfo>(pageNum, num, true);
                     IPage<OrderInfo> orderInfo = orderMapper.getOrderInfo(page);
@@ -94,24 +97,22 @@ public class OrderServiceImpl implements OrderService {
                 });
                 futureList.add(listFuture);
             }
-            List<OrderExcel> listExcel = new ArrayList<>();
-            for (Future<List<OrderInfo>> f : futureList) {
-                try {
+            try {
+                for (int i = 0; i < futureList.size(); i++) {
+                    WriteSheet sheet = EasyExcel.writerSheet(i, "order" + i).build();
+                    Future<List<OrderInfo>> f = futureList.get(i);
                     List<OrderInfo> list = f.get();
                     List<OrderExcel> orderExcels = OrderInfoConverter.INSTANCE.toOrderExcelList(list);
-                    listExcel.addAll(orderExcels);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                    write.write(orderExcels, sheet);
                 }
+            } catch (Exception e) {
+                log.error("e:", e);
+            } finally {
+                write.finish();
             }
 
-            EasyExcel.write(response.getOutputStream(), OrderExcel.class).sheet("order").doWrite(
-                    () -> {
-                        return null;
-                    }
-            );
-
         }
+
         LocalDateTime now2 = LocalDateTime.now();
         log.info("time:{}", Duration.between(now1, now2));
     }
