@@ -19,4 +19,8 @@ public class Constant {
     public void init(){
         log.info("config start");
     }
+
+    public String getURL(){
+        return URL;
+    }
 }

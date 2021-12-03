@@ -1,6 +1,9 @@
 package com.zpain.service;
 
 import com.alibaba.fastjson.JSON;
+import com.zpain.config.util.Constant;
+import com.zpain.service.controller.ApplicationUtil;
+import com.zpain.service.controller.TestBean;
 import com.zpain.service.controller.User;
 import com.zpain.service.domain.Result;
 import com.zpain.service.excel.OrderExcel;
@@ -9,6 +12,7 @@ import com.zpain.service.pojo.OrderInfo;
 import com.zpain.service.service.OrderIService;
 import com.zpain.service.service.OrderService;
 import com.zpain.service.util.KeyGenerator;
+import com.zpain.service.util.bloom.RedisBloom;
 import com.zpain.service.util.mapsturct.OrderInfoConverter;
 import kong.unirest.GenericType;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -120,15 +123,35 @@ class ServiceApplicationTests {
 
     @Test
     public void test() {
-        List<OrderInfo> list = IntStream.rangeClosed(1,2).mapToObj( i->{
+        List<OrderInfo> list = IntStream.rangeClosed(1, 2).mapToObj(i -> {
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.setOrderId(String.valueOf(i));
             orderInfo.setCreateDate(LocalDateTime.now());
             return orderInfo;
-        } ).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
         List<OrderExcel> orderExcels = OrderInfoConverter.INSTANCE.toOrderExcelList(list);
         log.info("a:{}", JSON.toJSONString(orderExcels));
+    }
+
+    @Autowired
+    private RedisBloom redisBloom;
+
+    @Test
+    public void redisBloom() {
+        boolean b = redisBloom.checkBloom("z:1");
+        log.info("b:{}", b);
+    }
+
+
+    @Autowired
+    private ApplicationUtil applicationUtil;
+
+    @Test
+    public void testBean() {
+        TestBean bean = applicationUtil.getBean(TestBean.class);
+        String url = bean.a();
+        log.info("url:{}", url);
     }
 
 

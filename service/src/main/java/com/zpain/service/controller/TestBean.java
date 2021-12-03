@@ -11,10 +11,14 @@ import javax.annotation.PostConstruct;
  */
 @Component
 @Slf4j
-public class Test {
+public class TestBean {
 
     @PostConstruct
     public void init(){
         log.info("service start");
+    }
+
+    public String a(){
+        return "a";
     }
 }
