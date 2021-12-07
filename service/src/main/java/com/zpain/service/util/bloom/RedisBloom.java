@@ -20,7 +20,7 @@ public class RedisBloom {
 
     public boolean checkBloom(String key) {
         RBloomFilter<String> bloomFilter = redissonClient.getBloomFilter("z");
-        boolean bl = bloomFilter.tryInit(5, 0);
+        boolean bl = bloomFilter.tryInit(6, 0);
 
         for (int i = 0; i < 10; i++) {
             bloomFilter.add("z1:" + i);
