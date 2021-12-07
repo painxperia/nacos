@@ -23,7 +23,7 @@ public class RedisBloom {
         boolean bl = bloomFilter.tryInit(5, 0);
 
         for (int i = 0; i < 10; i++) {
-            bloomFilter.add("z:" + i);
+            bloomFilter.add("z1:" + i);
         }
         log.info("size1:{}",bloomFilter.count());
         boolean contains = bloomFilter.contains(key);
