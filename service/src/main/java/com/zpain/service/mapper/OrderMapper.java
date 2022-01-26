@@ -31,6 +31,8 @@ public interface OrderMapper extends BaseMapper<OrderInfo> {
      */
     IPage<OrderInfo> getOrderInfo(Page<OrderInfo> orderInfoPage);
 
+    List<OrderInfo> getOrderInfo();
+
     int insertBatchSomeColumn(List<OrderInfo> entityList);
 
 }

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +29,7 @@ public class UserRole implements Serializable {
     private Long id;
 
     @TableField("user_id")
+    @JsonFilter("userid")
     private Long userId;
 
     @TableField("role_id")

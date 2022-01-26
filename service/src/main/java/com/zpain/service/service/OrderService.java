@@ -6,6 +6,7 @@ import com.zpain.service.pojo.OrderInfo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author zhangjun
@@ -29,6 +30,8 @@ public interface OrderService {
      * @return
      */
     Result<IPage<OrderInfo>> getOrderList(Integer pageNum, Integer pageSize);
+
+    List<OrderInfo> getOrderList();
 
     /**
      * 获取所有数据

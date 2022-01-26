@@ -93,8 +93,6 @@ class ServiceApplicationTests {
 
     @Test
     public void getAll() {
-        Result<IPage<OrderInfo>> orderList = orderService.getOrderList(1, 10);
-        log.info("list:{}",JSON.toJSONString(orderList.getData().getRecords()));
     }
 
     @Test

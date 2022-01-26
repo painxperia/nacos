@@ -3,13 +3,15 @@ package com.zpain.service.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * @author zhangjun
  * @date 2021/6/11  15:15
  */
 @Getter
 @Setter
-public class Result<T> {
+public class Result<T> implements Serializable {
 
     private Integer code;
 

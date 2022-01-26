@@ -3,6 +3,8 @@ package com.zpain.service.service.impl;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -12,9 +14,9 @@ import com.zpain.service.mapper.OrderMapper;
 import com.zpain.service.pojo.OrderInfo;
 import com.zpain.service.service.OrderService;
 import com.zpain.service.util.KeyGenerator;
-import com.zpain.service.util.mapsturct.OrderInfoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -50,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setId(Long.valueOf(id));
             int i = orderMapper.insertOrder(orderInfo);
             if (i > 0) {
-                int a = 1/0;
+                int a = 1 / 0;
                 return Result.success();
             } else {
                 return Result.fail("插入失败");
@@ -64,8 +66,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Result<IPage<OrderInfo>> getOrderList(Integer pageNum, Integer pageSize) {
+        log.info("pageNum:{},pageSize:{}", pageNum, pageSize);
         Page<OrderInfo> page = new Page<OrderInfo>(pageNum, pageSize, true);
         return Result.success(orderMapper.getOrderInfo(page));
+    }
+
+    @Override
+    @Cacheable("orderList")
+    public List<OrderInfo> getOrderList() {
+        return orderMapper.getOrderInfo();
     }
 
     @Override
