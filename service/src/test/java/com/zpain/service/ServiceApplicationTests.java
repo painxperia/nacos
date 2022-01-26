@@ -1,7 +1,7 @@
 package com.zpain.service;
 
 import com.alibaba.fastjson.JSON;
-import com.zpain.config.util.Constant;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zpain.service.controller.ApplicationUtil;
 import com.zpain.service.controller.TestBean;
 import com.zpain.service.controller.User;
@@ -22,7 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -91,8 +93,8 @@ class ServiceApplicationTests {
 
     @Test
     public void getAll() {
-        OrderInfo orderInfo = orderIService.getById(670225350130663424L);
-        log.info("orderInfo:{}", orderInfo);
+        Result<IPage<OrderInfo>> orderList = orderService.getOrderList(1, 10);
+        log.info("list:{}",JSON.toJSONString(orderList.getData().getRecords()));
     }
 
     @Test
@@ -130,8 +132,8 @@ class ServiceApplicationTests {
             return orderInfo;
         }).collect(Collectors.toList());
 
-        List<OrderExcel> orderExcels = OrderInfoConverter.INSTANCE.toOrderExcelList(list);
-        log.info("a:{}", JSON.toJSONString(orderExcels));
+//        List<OrderExcel> orderExcels = OrderInfoConverter.INSTANCE.toOrderExcelList(list);
+//        log.info("a:{}", JSON.toJSONString(orderExcels));
     }
 
     @Autowired
@@ -152,6 +154,19 @@ class ServiceApplicationTests {
         TestBean bean = applicationUtil.getBean(TestBean.class);
         String url = bean.a();
         log.info("url:{}", url);
+    }
+
+    @Test
+    public void testSql() throws Exception {
+        // 200
+        List<String> list = new ArrayList<>();
+        ForkJoinPool forkJoinPool = new ForkJoinPool(3);
+        forkJoinPool.submit(() -> {
+            list.parallelStream().forEach(i -> {
+
+            });
+        }).get();
+
     }
 
 

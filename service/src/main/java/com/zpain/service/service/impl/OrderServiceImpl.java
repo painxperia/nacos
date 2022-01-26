@@ -16,6 +16,8 @@ import com.zpain.service.util.mapsturct.OrderInfoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -41,18 +43,21 @@ public class OrderServiceImpl implements OrderService {
     private KeyGenerator keyGenerator;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<Boolean> insertOrder(OrderInfo orderInfo) {
         try {
             String id = keyGenerator.generatorSnowflakeKey();
             orderInfo.setId(Long.valueOf(id));
             int i = orderMapper.insertOrder(orderInfo);
             if (i > 0) {
+                int a = 1/0;
                 return Result.success();
             } else {
                 return Result.fail("插入失败");
             }
         } catch (Exception e) {
             log.error("OrderServiceImpl[insertOrder] error:", e);
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return Result.fail("插入失败" + e.getMessage());
         }
     }
@@ -102,8 +107,8 @@ public class OrderServiceImpl implements OrderService {
                     WriteSheet sheet = EasyExcel.writerSheet(i, "order" + i).build();
                     Future<List<OrderInfo>> f = futureList.get(i);
                     List<OrderInfo> list = f.get();
-                    List<OrderExcel> orderExcels = OrderInfoConverter.INSTANCE.toOrderExcelList(list);
-                    write.write(orderExcels, sheet);
+//                    List<OrderExcel> orderExcels = OrderInfoConverter.INSTANCE.toOrderExcelList(list);
+//                    write.write(orderExcels, sheet);
                 }
             } catch (Exception e) {
                 log.error("e:", e);

@@ -18,6 +18,6 @@ public interface OrderInfoConverter {
 
     OrderExcel toOrderExcel(OrderInfo orderInfo);
 
-    List<OrderExcel> toOrderExcelList(List<OrderInfo> orderInfo);
+//    List<OrderExcel> toOrderExcelList(List<OrderInfo> orderInfo);
 
 }
