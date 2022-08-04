@@ -1,19 +1,15 @@
 package com.zpain.service;
 
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.zpain.service.controller.ApplicationUtil;
 import com.zpain.service.controller.TestBean;
 import com.zpain.service.controller.User;
 import com.zpain.service.domain.Result;
-import com.zpain.service.excel.OrderExcel;
 import com.zpain.service.mapper.OrderMapper;
 import com.zpain.service.pojo.OrderInfo;
 import com.zpain.service.service.OrderIService;
 import com.zpain.service.service.OrderService;
 import com.zpain.service.util.KeyGenerator;
 import com.zpain.service.util.bloom.RedisBloom;
-import com.zpain.service.util.mapsturct.OrderInfoConverter;
 import kong.unirest.GenericType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -24,9 +20,13 @@ import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 @SpringBootTest
@@ -156,14 +156,59 @@ class ServiceApplicationTests {
 
     @Test
     public void testSql() throws Exception {
-        // 200
-        List<String> list = new ArrayList<>();
-        ForkJoinPool forkJoinPool = new ForkJoinPool(3);
-        forkJoinPool.submit(() -> {
-            list.parallelStream().forEach(i -> {
+        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(100);
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 5, 3
+                , TimeUnit.SECONDS, queue, new ThreadPoolExecutor.AbortPolicy());
 
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            list.add(i);
+        }
+        for (int i = 0; i < list.size(); i++) {
+            final int a = list.get(i);
+            executor.submit(() -> {
+                System.out.println(Thread.currentThread().getName() + ":" + a);
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
+                    System.out.println("error:" + e);
+                }
             });
-        }).get();
+        }
+    }
+
+    public static void main(String[] args) throws Exception{
+        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(4);
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 5, 3
+                , TimeUnit.SECONDS, queue, new ThreadPoolExecutor.CallerRunsPolicy());
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 19; i++) {
+            list.add(i);
+        }
+        for (int i = 0; i < list.size(); i++) {
+            final int a = list.get(i);
+            executor.submit(() -> {
+                System.out.println(Thread.currentThread().getName() + ":" + a);
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception e) {
+                    System.out.println("error:" + e);
+                }
+            });
+        }
+
+//        ForkJoinPool pool = new ForkJoinPool(5);
+//        pool.submit( ()->{
+//            list.parallelStream().forEach( i ->{
+//                try {
+//                    System.out.println(Thread.currentThread().getName() + ":" + i);
+//                    TimeUnit.SECONDS.sleep(2);
+//                }catch (Exception e){
+//
+//                }
+//            } );
+//        } ).get();
+
 
     }
 

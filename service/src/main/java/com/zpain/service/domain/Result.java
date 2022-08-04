@@ -47,6 +47,10 @@ public class Result<T> implements Serializable {
         this.data = data;
     }
 
+    public static <T> Result<T> falseResult(String message) {
+        return new Result<T>(1001, message);
+    }
+
     public static <T> Result<T> fail(String message){
         return new Result<T>(1001,message);
     }
